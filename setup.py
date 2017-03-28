@@ -17,6 +17,7 @@ setup(
     author_email='rajiv.abraham@gmail.com',
     url='https://github.com/scoremedia/marol',
     license=license,
+    install_requires=['docker'],
     packages=find_packages(exclude=('tests', 'docs', 'venv')),
     classifiers=[
         'Development Status :: 3 - Alpha',

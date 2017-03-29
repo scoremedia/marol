@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .context import marol
+
 import unittest
 import os
 
@@ -13,7 +14,10 @@ class BasicTestSuite(unittest.TestCase):
     """Basic test cases."""
 
     def test_absolute_truth_and_meaning(self):
-        print(marol.get_lambda_files(marol.project.root() + '/tests/data/dummy_handler.py', '3.6.0'))
+        # print(marol.get_lambda_files(marol.project.root() + '/tests/data/dummy_handler.py', '3.6.0'))
+        # print(marol.helpers.determine_home_path())
+        print(marol.build_marol_environment('3.6.1'))
+        # print('Hi')
         assert True
 
 

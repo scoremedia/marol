@@ -3,4 +3,4 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/../scripts
 
-python marol.py --python_version ${python_version} --handler ${handler}
+python marol.py --python_version ${python_version}

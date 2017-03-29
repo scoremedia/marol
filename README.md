@@ -1,5 +1,4 @@
 # Marol
-========================
 
 Marol enables you to run Python 3 code on AWS Lambda. 
 

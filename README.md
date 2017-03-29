@@ -43,6 +43,9 @@ Add the following line to your `requirements.txt` file
 
 ## Usage
 
+Your deployment scripts for lambda should specify `handler.py` and `handler` as the starting point for your Lambda function. This is the Python2 handler returned by Marol which calls your modified Python3 handler.
+
+
 ```python
 import marol
 my_project_site_packages = ...

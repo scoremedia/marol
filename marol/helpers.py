@@ -48,20 +48,73 @@ def determine_home_path():
             home_path = os.environ['HOME']
         else:
             home_path = os.path.expanduser('~')
-        return os.path.join(home_path, DEFAULT_HOME)
+        path = os.path.join(home_path, DEFAULT_HOME)
     else:
-        return os.environ['MAROL_HOME']
+        path = os.environ['MAROL_HOME']
+
+    os.makedirs(path, exist_ok=True)
+    return path
 
 
 def build_marol_environment(python_version):
-    home_path = determine_home_path()
-    os.makedirs(home_path, exist_ok=True)
-    python_tar_path = PYTHON_TAR_TEMPLATE.format(python_version=python_version)
-    staging_path = os.path.join(home_path, STAGING_PATH, python_version)
-
-    os.makedirs(staging_path, exist_ok=True)
-    urllib.request.urlretrieve(python_tar_path,
-                               os.path.join(staging_path,
-                                            FILE_NAME_TEMPLATE.format(python_version=python_version)))
+    staging_tar_path = download_source(python_version)
+    build_environment(staging_tar_path, python_version)
 
     pass
+
+
+def build_environment(staging_tar_path, python_version):
+    src_path = '/src'
+    image = 'lambci/lambda:build'
+
+    client = docker.from_env()
+
+    volume_bindings = {
+        staging_tar_path: {
+            'bind': src_path,
+            'mode': 'rw',
+        },
+    }
+
+    python_main_version = python_version.rpartition('.')[0]
+    python_version_root = python_version.partition('.')[0]
+
+    commands = [
+        'rm -rf marol_venv/',
+        'rm -rf Python-{python_version}'.format(python_version=python_version),
+        'tar xfz Python-{python_version}.tgz'.format(python_version=python_version),
+        'cd Python-{python_version}'.format(python_version=python_version),
+        './configure',
+        'make',
+        'make install',
+        'cd ..',
+        'pip3 install virtualenv',
+        'virtualenv -p /usr/local/bin/python{python_version_root} marol_venv'.format(
+            python_version_root=python_version_root),
+        'rm -rf marol_venv/lib/python{python_main_version}/'.format(python_main_version=python_main_version),
+        'cp -rf /usr/local/lib/python{python_main_version} marol_venv/lib/'.format(
+            python_main_version=python_main_version),
+        'find . -name __pycache__ -type d -exec rm -rf {} +',
+        'rm marol_venv/include/python{python_main_version}m'.format(python_main_version=python_main_version),
+        'cp -rf /usr/local/include/python{python_main_version}m marol_venv/include/'.format(
+            python_main_version=python_main_version)
+    ]
+    command_str = ' && '.join(commands)
+    command_line = ['sh', '-c', command_str]
+    client.containers.run(image=image,
+                          command=command_line,
+                          volumes=volume_bindings,
+                          working_dir=src_path)
+
+    pass
+
+
+def download_source(python_version):
+    home_path = determine_home_path()
+    python_server_tar_path = PYTHON_TAR_TEMPLATE.format(python_version=python_version)
+    staging_area_path = os.path.join(home_path, STAGING_PATH, python_version)
+    os.makedirs(staging_area_path, exist_ok=True)
+    staging_tar_path = os.path.join(staging_area_path, FILE_NAME_TEMPLATE.format(python_version=python_version))
+    urllib.request.urlretrieve(python_server_tar_path,
+                               staging_tar_path)
+    return staging_area_path

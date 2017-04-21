@@ -4,7 +4,7 @@ Marol enables you to run Python 3 code on AWS Lambda.
 
 ## Python 3 version support
 
-* Supports 3.6.0
+* Currently supports 3.6.1
 
 
 ## Instructions
@@ -51,7 +51,7 @@ import marol
 my_project_site_packages = ...
 deploy_lambda('production',
               lambda_name,
-              marol.get_lambda_files('~/mypath/mypy3handler.py', '3.6.0') + my_project_site_packages,
+              marol.get_lambda_files('~/mypath/mypy3handler.py', '3.6.1') + my_project_site_packages,
               'lambda_s3_exec_role',
               128,
               300,
@@ -60,3 +60,9 @@ deploy_lambda('production',
               region_name='us-east-1')
 
 ```
+
+
+## Notes
+* Working Call: `./scripts/marol-build.py`
+* It will create `marol_venv` in `~/.marol/staging/<python_version>`
+* Right now, to make it work, we have to copy `~/.marol/staging/<python_version>/marol_venv` to `marol/environments/<python_version>/marol_venv`

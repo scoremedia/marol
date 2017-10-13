@@ -1,10 +1,10 @@
 # Marol
 
-Marol enables you to run Python 3 code on AWS Lambda. 
+Run any Python version instead of the standard AWS Lambda Python version.
 
 ## Python 3 version support
 
-* Currently supports 3.6.1
+* Currently supports 3.6.1 +
 
 
 ## Instructions

@@ -11,14 +11,15 @@ with open('LICENSE') as f:
 setup(
     name='marol',
     version='0.0.1',
-    description='Run Python 3 code on AWS Lambda',
+    description='Run Any Python version on AWS Lambda',
     long_description=readme,
     author='Rajiv Abraham',
     author_email='rajiv.abraham@gmail.com',
     url='https://github.com/scoremedia/marol',
     license=license,
     install_requires=['docker'],
-    packages=find_packages(exclude=('tests', 'docs', 'venv')),
+    # packages=find_packages(exclude=('tests', 'docs', 'venv')),
+    packages=['bin', 'marol', 'scripts'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',

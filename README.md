@@ -1,10 +1,13 @@
+# Disclaimer
+* theScore does not use this in production. This library was built when AWS Lambda was stuck at 2.7 for a long time and we wanted to use Python 3. Two days after this idea succeeded, AWS announced support for 3.6 :). However, this may still be of use to those who want to use versions other than the official version
+
 # Marol
 
 Run any Python 3 version instead of the standard AWS Lambda Python version.
 
 ## Python 3 version support
 
-* Currently supports 3.6.1 +
+* Tested on 3.6.1 and 3.6.2
 
 
 ## Instructions
@@ -14,7 +17,7 @@ You pass in your handler file(e.g. `my_handler.py`) and it returns back:
 * `handler.py`. This is the Python2 module that is called which delegates to the Python3 handler file
 * path to `marol_venv` folder. This is the folder which contains all the executables for the Python version that you chose.
 
-To use Marol, your `my_handler.py` will have to have the following constraints:
+To use Marol, your `my_handler.py` will have the following constraints:
 
 * The handler function should be named `handler`
 * The file cannot be called `handler.py`(This is reserved for the Python2 handler which will execute the Python3 handler
@@ -31,20 +34,6 @@ To use Marol, your `my_handler.py` will have to have the following constraints:
 ### Mac OS X
 * Open the terminal and run `/Applications/<Python Version>/Install Certificates.command` 
 
-Since it is a private repo for now, you can install it by
-
-```
-pip install git+ssh://git@github.com/scoremedia/marol.git
-
-```
-or ..
-### requirements.txt
-
-Add the following line to your `requirements.txt` file
-
-```
--e git+ssh://git@github.com/scoremedia/marol.git#egg=marol
-```
 
 ## Usage
 
@@ -54,29 +43,30 @@ Your deployment scripts for lambda should specify `handler.py` and `handler` as 
 ```python
 import marol
 my_project_site_packages = ...
-deploy_lambda('production',
-              lambda_name,
-              marol.get_lambda_files('~/mypath/mypy3handler.py', '3.6.1') + my_project_site_packages,
-              'lambda_s3_exec_role',
-              128,
-              300,
-              lambda_description='Test for Python 3',
-              handler_name="handler",
-              region_name='us-east-1')
+my_deploy_lambda_function(lambda_name,
+                          marol.get_lambda_files('~/mypath/mypy3handler.py', '3.6.1') + my_project_site_packages,
+                          'lambda_s3_exec_role',
+                          128,
+                          300,
+                          lambda_description='Test for Python 3',
+                          handler_name="handler",
+                          region_name='us-east-1')
 
 ```
 
+`get_lambda_files` will check `MAROL_HOME` if `marol_venv` works for the particular version that you want. If it exists, you will get back that path. If it does not exist,`marol` 
+* download the python source
+* build the binaries in [docker image](https://github.com/lambci/docker-lambda) which mirrors the AWS Lambda Environment
+* create a basic `marol_venv` and store it at `MAROL_HOME`
 
 ## Future Work
 * Some of the context attributes are not supported yet.
 * Ensure that the context object is updated for future changes
 
 ## Notes
-* Working Call: `./scripts/marol-build.py`
+* Default Marol home is '<HOME>/.marol'. 
 * It will create `marol_venv` in `~/.marol/staging/<python_version>`
-* Right now, to make it work, we have to copy `~/.marol/staging/<python_version>/marol_venv` to `marol/environments/<python_version>/marol_venv`
 
 
 ## Notes for those thinking about security
-* This uses the docker image: https://github.com/lambci/docker-lambda
-* Marol will download the Python Source and build it and place it in `MAROL_HOME` if defined or `~/.marol` on Unix systems
+* This uses an unofficial [docker image](https://github.com/lambci/docker-lambda)

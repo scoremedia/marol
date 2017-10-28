@@ -1,6 +1,6 @@
 # Marol
 
-Run any Python version instead of the standard AWS Lambda Python version.
+Run any Python 3 version instead of the standard AWS Lambda Python version.
 
 ## Python 3 version support
 
@@ -25,6 +25,11 @@ To use Marol, your `my_handler.py` will have to have the following constraints:
 
 
 ## Installation
+### Pre-requisites
+* Ensure `docker` is installed and running on the machine where Marol is executed.
+
+### Mac OS X
+* Open the terminal and run `/Applications/<Python Version>/Install Certificates.command` 
 
 Since it is a private repo for now, you can install it by
 
@@ -62,7 +67,16 @@ deploy_lambda('production',
 ```
 
 
+## Future Work
+* Some of the context attributes are not supported yet.
+* Ensure that the context object is updated for future changes
+
 ## Notes
 * Working Call: `./scripts/marol-build.py`
 * It will create `marol_venv` in `~/.marol/staging/<python_version>`
 * Right now, to make it work, we have to copy `~/.marol/staging/<python_version>/marol_venv` to `marol/environments/<python_version>/marol_venv`
+
+
+## Notes for those thinking about security
+* This uses the docker image: https://github.com/lambci/docker-lambda
+* Marol will download the Python Source and build it and place it in `MAROL_HOME` if defined or `~/.marol` on Unix systems

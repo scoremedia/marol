@@ -1,7 +1,7 @@
 import inspect
 from textwrap import dedent
 import shutil
-from . import project
+# from . import project
 from . import handler_python3_meta as meta
 import os
 import docker
@@ -11,15 +11,30 @@ DEFAULT_HOME = '.marol'
 PYTHON_TAR_TEMPLATE = 'https://www.python.org/ftp/python/{python_version}/Python-{python_version}.tgz'
 FILE_NAME_TEMPLATE = 'Python-{python_version}.tgz'
 STAGING_PATH = 'staging'
+DEF_LOAD = 'def load('
+DEF_READ_EXECUTION_UUID = 'def read_execution_uuid('
+MAIN_STATEMENT = "if __name__ == '__main__':"
+
+PRE_DEFINED_LINES = [DEF_LOAD, DEF_READ_EXECUTION_UUID, MAIN_STATEMENT]
+DEF_HANDLER = 'def handler('
 
 
-def get_answer():
-    """Get an answer."""
-    return True
+def predefined_functions_present(handler_file: str) -> bool:
+    with open(handler_file) as f:
+        source_code = f.read()
+        is_predefined_functions_present = [True for line in PRE_DEFINED_LINES if line in source_code]
+        return any(is_predefined_functions_present)
 
 
-def write_handler_python3(py3_handler_file_path, tmp_python3_path):
+def is_handler_function_present(handler_file_path: str) -> bool:
+    with open(handler_file_path) as f:
+        source_code = f.read()
+        return True if DEF_HANDLER in source_code else False
+
+
+def write_handler_python3(py3_handler_file_path: str, tmp_python3_path: str) -> None:
     shutil.copyfile(py3_handler_file_path, tmp_python3_path)
+    # TODO: Check that there is no main starter in the code
     main_starter_code = """
     if __name__ == '__main__':
         main()
@@ -32,17 +47,17 @@ def write_handler_python3(py3_handler_file_path, tmp_python3_path):
             f.write(code_str)
 
 
-def marol_environment_path(version):
-    path = project.root() + '/environments/{version}/marol_venv'.format(version=version)
+def get_or_build_marol_environment_path(version: str, marol_home_path: str = None) -> str:
+    _marol_home_path = marol_home_path or determine_home_path()
+    path = os.path.join(_marol_home_path, 'staging', version, 'marol_venv')
     if os.path.exists(path):
         return path
     else:
-        raise ValueError(
-            'Python Version:{version} is not supported. Contact project committers.'.format(version=version))
+        build_marol_environment(version, _marol_home_path)
     return path
 
 
-def determine_home_path():
+def determine_home_path() -> str:
     if 'MAROL_HOME' not in os.environ:
         if 'HOME' in os.environ:
             home_path = os.environ['HOME']
@@ -56,21 +71,21 @@ def determine_home_path():
     return path
 
 
-def build_marol_environment(python_version):
-    staging_tar_path = download_source(python_version)
-    build_environment(staging_tar_path, python_version)
+def build_marol_environment(python_version, marol_home_path):
+    staging_area_for_version_path = download_source(python_version, marol_home_path)
+    build_environment(staging_area_for_version_path, python_version)
 
     pass
 
 
-def build_environment(staging_tar_path, python_version):
+def build_environment(staging_area_for_version_path, python_version):
     src_path = '/src'
     image = 'lambci/lambda:build'
 
     client = docker.from_env()
 
     volume_bindings = {
-        staging_tar_path: {
+        staging_area_for_version_path: {
             'bind': src_path,
             'mode': 'rw',
         },
@@ -109,8 +124,7 @@ def build_environment(staging_tar_path, python_version):
     pass
 
 
-def download_source(python_version):
-    home_path = determine_home_path()
+def download_source(python_version, home_path):
     python_server_tar_path = PYTHON_TAR_TEMPLATE.format(python_version=python_version)
     staging_area_path = os.path.join(home_path, STAGING_PATH, python_version)
     os.makedirs(staging_area_path, exist_ok=True)

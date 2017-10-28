@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 with open('README.md') as f:
     readme = f.read()
@@ -18,8 +18,7 @@ setup(
     url='https://github.com/scoremedia/marol',
     license=license,
     install_requires=['docker'],
-    # packages=find_packages(exclude=('tests', 'docs', 'venv')),
-    packages=['bin', 'marol', 'scripts'],
+    packages=['marol'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',

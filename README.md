@@ -1,3 +1,6 @@
+[![PyPI version](https://badge.fury.io/py/marol.svg)](https://badge.fury.io/py/marol)
+[![Dependency Status](https://gemnasium.com/badges/github.com/scoremedia/marol.svg)](https://gemnasium.com/github.com/scoremedia/marol)
+
 # Disclaimer
 * theScore does not use this in production. This library was built when AWS Lambda was stuck at 2.7 for a long time and we wanted to use Python 3. Two days after this idea succeeded, AWS announced support for 3.6 :). However, this may still be of use to those who want to use versions other than the official version
 
@@ -7,7 +10,7 @@ Run any Python 3 version instead of the standard AWS Lambda Python version.
 
 ## Python 3 version support
 
-* Tested on 3.6.1 and 3.6.2
+* Tested on 3.6.1, 3.6.2, 3.6.3
 
 
 ## Instructions
@@ -50,14 +53,15 @@ my_deploy_lambda_function(lambda_name,
                           300,
                           lambda_description='Test for Python 3',
                           handler_name="handler",
+                          handler_file="handler.py",
                           region_name='us-east-1')
 
 ```
 
-`get_lambda_files` will check `MAROL_HOME` if `marol_venv` works for the particular version that you want. If it exists, you will get back that path. If it does not exist,`marol` 
+`get_lambda_files` will check `MAROL_HOME` if `marol_venv` exists for the particular version that you want. If it exists, you will get back that path. If it does not exist,`marol` will 
 * download the python source
-* build the binaries in [docker image](https://github.com/lambci/docker-lambda) which mirrors the AWS Lambda Environment
-* create a basic `marol_venv` and store it at `MAROL_HOME`
+* build the binaries using a [docker image](https://github.com/lambci/docker-lambda) which mirrors the AWS Lambda environment
+* create a basic `marol_venv` and store it at `MAROL_HOME/staging/<python_version>`
 
 ## Future Work
 * Some of the context attributes are not supported yet.

@@ -64,7 +64,7 @@ my_deploy_lambda_function(lambda_name,
 * Ensure that the context object is updated for future changes
 
 ## Notes
-* This adds an additional 3-5 seconds to execution time.
+* This adds an additional 2-5 seconds to execution time.
 * This only provides the core Python libraries. 
 * Default Marol home is `<HOME>/.marol`. 
 * It will create `marol_venv` in `<HOME>/.marol/staging/<python_version>`

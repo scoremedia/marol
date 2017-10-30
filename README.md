@@ -64,8 +64,8 @@ my_deploy_lambda_function(lambda_name,
 * Ensure that the context object is updated for future changes
 
 ## Notes
-* Default Marol home is '\<HOME\>/.marol'. 
-* It will create `marol_venv` in `~/.marol/staging/<python_version>`
+* Default Marol home is `<HOME>/.marol`. 
+* It will create `marol_venv` in `<HOME>/.marol/staging/<python_version>`
 
 
 ## Notes for those thinking about security
